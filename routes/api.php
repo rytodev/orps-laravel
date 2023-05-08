@@ -24,3 +24,6 @@ Route::get('/show-note/{id}', [Controllers\NoteApiController::class, 'show']);
 Route::post('/add-note', [Controllers\NoteApiController::class, 'store']);
 Route::put('/update-note/{id}', [Controllers\NoteApiController::class, 'update']);
 Route::delete('/delete-note/{id}', [Controllers\NoteApiController::class, 'delete']);
+
+//Auth
+Route::post('/login', [Controllers\AuthApiController::class, 'login']);
