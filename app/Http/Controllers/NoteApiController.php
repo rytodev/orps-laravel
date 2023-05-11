@@ -3,54 +3,77 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use App\Models\Note;
-use Illuminate\Support\Facades\Validator; //import validator
-
 
 class NoteApiController extends Controller
 {
 
-    public function index()
+    public function __construct()
     {
-        $notes = Note::all();
-        return response()->json($notes);
+        $this->middleware('auth:sanctum');
     }
 
-    public function show($id)
+    public function index()
     {
-        $note = Note::where('id', $id)->get();
-        return response()->json($note);
+        $user = Auth::user();
+        $notes = Note::where('user_id', $user->id)->get();
+        return response()->json(['notes' => $notes]);
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required', 'max:100',
-            'description' => 'max:1000',
+        $validator = Validator::make($request->all(), [
+            'title' => 'required',
+            'description' => 'required',
         ]);
 
-        // $validatedData['user_id'] = auth()->user()->id;
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 400);
+        }
+
+        $user = Auth::user();
         $note = new Note();
-        $note->user_id = $request->user_id;
+        $note->user_id = $user->id;
         $note->title = $request->title;
         $note->description = $request->description;
         $note->save();
-        return response()->json('masukk');
+        return response()->json(['message' => 'Note created!', 'note' => $note], 201);
     }
 
     public function update(Request $request)
     {
-        $note = $request->validate([
-            'title' => 'required', 'max:100',
-            'description' => 'max:1000',
+        $user = Auth::user();
+
+        //cek user
+        if ($user->id != $request->user_id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+        //validasi data masuk
+        $validator = Validator::make($request->all(), [
+            'title' => 'required',
+            'description' => 'required',
         ]);
-        Note::where('id', $request->id)->update($note);
-        return response()->json('masukk');
+        //bila gagal validasi
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 400);
+        }
+        //update note
+        Note::where('id', $request->id)->update($request->all());
+
+        return response()->json(['message' => 'Note updated!']);
     }
 
-    public function delete($id)
+    public function destroy(Request $request)
     {
-        Note::destroy($id);
-        return response()->json();
+        $user = Auth::user();
+        //cek user
+        if ($user->id != $request->user_id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        Note::where('id', $request->id)->delete();
+        return response()->json(['message' => 'Note deleted!']);
     }
 }

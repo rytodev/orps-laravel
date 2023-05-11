@@ -19,11 +19,13 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/get-notes', [Controllers\NoteApiController::class, 'index']);
-Route::get('/show-note/{id}', [Controllers\NoteApiController::class, 'show']);
-Route::post('/add-note', [Controllers\NoteApiController::class, 'store']);
-Route::put('/update-note/{id}', [Controllers\NoteApiController::class, 'update']);
-Route::delete('/delete-note/{id}', [Controllers\NoteApiController::class, 'delete']);
+//note
+Route::get('/get-notes', [Controllers\NoteApiController::class, 'index'])->middleware('auth:sanctum');
+Route::get('/show-note', [Controllers\NoteApiController::class, 'show'])->middleware('auth:sanctum');;
+Route::post('/add-note', [Controllers\NoteApiController::class, 'store'])->middleware('auth:sanctum');
+Route::put('/update-note', [Controllers\NoteApiController::class, 'update'])->middleware('auth:sanctum');;
+Route::delete('/delete-note', [Controllers\NoteApiController::class, 'destroy'])->middleware('auth:sanctum');;
 
 //Auth
 Route::post('/login', [Controllers\AuthApiController::class, 'login']);
+Route::post('/logout', [Controllers\AuthApiController::class, 'logout'])->middleware('auth:sanctum');

@@ -10,28 +10,32 @@ class AuthApiController extends Controller
 {
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
         ]);
 
-        $credentials = $request->only('email', 'password');
-
-        if (Auth::attempt($credentials)) {
-            $user = Auth::user();
-            $token = $user->createToken('auth_token')->plainTextToken;
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Login successful!',
-                'user' => $user,
-                'token' => $token
-            ], 200);
+        if (!Auth::attempt($credentials)) {
+            return response()->json(['message' => 'Unauthorized'], 401);
         }
 
+        $user = $request->user();
+        // Hapus token lama
+        $user->tokens()->delete();
+        // Generate token baru
+        $token = $user->createToken('auth_token')->plainTextToken;
+
         return response()->json([
-            'status' => 'error',
-            'message' => 'Invalid credentials'
-        ], 401);
+            'access_token' => $token,
+            'status' => 'success',
+            'message' => 'Login successful',
+        ], 200);
+    }
+
+    public function logout(Request $request)
+    {
+        $user = Auth::user();
+        $user->tokens()->delete(); //ignore error
+        return response()->json(['message' => 'Logout successful']);
     }
 }
