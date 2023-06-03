@@ -11,8 +11,8 @@ class Note extends Model
 
     protected $guard = ['id'];
 
-    // public function user()
-    // {
-    //     return $this->belongsTo(User::class, 'user_id');
-    // }
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

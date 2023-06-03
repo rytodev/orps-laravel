@@ -1,31 +1,25 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
 |--------------------------------------------------------------------------
 |
 | Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
+| routes are loaded by the RouteServiceProvider within a group which
+| is assigned the "api" middleware group. Enjoy building your API!
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
-//note
-Route::get('/get-notes', [Controllers\NoteApiController::class, 'index'])->middleware('auth:sanctum');
-Route::get('/show-note', [Controllers\NoteApiController::class, 'show'])->middleware('auth:sanctum');;
-Route::post('/add-note', [Controllers\NoteApiController::class, 'store'])->middleware('auth:sanctum');
-Route::put('/update-note', [Controllers\NoteApiController::class, 'update'])->middleware('auth:sanctum');;
-Route::delete('/delete-note', [Controllers\NoteApiController::class, 'destroy'])->middleware('auth:sanctum');;
-
 //Auth
-Route::post('/login', [Controllers\AuthApiController::class, 'login']);
-Route::post('/logout', [Controllers\AuthApiController::class, 'logout'])->middleware('auth:sanctum');
+Route::post('/login', [Controllers\Api\AuthApiController::class, 'login']);
+Route::post('/logout', [Controllers\Api\AuthApiController::class, 'logout'])->middleware('auth:sanctum');
+
+//Lokasi
+Route::get('/get-lokasi', [Controllers\Api\LokasiApiController::class, 'index'])->middleware('auth:sanctum');
+Route::post('/add-lokasi', [Controllers\Api\LokasiApiController::class, 'store'])->middleware('auth:sanctum');
+Route::put('/update-lokasi', [Controllers\Api\LokasiApiController::class, 'update'])->middleware('auth:sanctum');
+Route::delete('/delete-lokasi', [Controllers\Api\LokasiApiController::class, 'destroy'])->middleware('auth:sanctum');
+Route::get('/image/{id}', [Controllers\Api\LokasiApiController::class, 'getImage'])->middleware('auth:sanctum');
