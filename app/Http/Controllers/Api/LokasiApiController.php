@@ -19,9 +19,17 @@ class LokasiApiController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $lokasi = Lokasi::where('user_id', $user->id)->get();
-        // $lokasi = Lokasi::all();
-        return response()->json($lokasi);
+        $lokasis = Lokasi::where('user_id', $user->id)->get();
+
+        foreach ($lokasis as $lokasi) {
+            $foto = null;
+            if ($lokasi->foto) {
+                $foto = Storage::disk('public')->get("foto_tps/{$lokasi->foto}");
+                $foto = base64_encode($foto);
+            }
+            $lokasi->foto = $foto;
+        }
+        return response()->json($lokasis);
     }
 
     public function store(Request $request)
@@ -55,7 +63,7 @@ class LokasiApiController extends Controller
         $lokasi->lat = $request->lat;
         $lokasi->foto = $request->fotoName;
         $lokasi->save();
-        return response()->json(['message' => 'Lokasi created!']);
+        return response()->json(['message' => 'Lokasi created!', 'data' => $lokasi]);
     }
 
     public function update(Request $request)
@@ -98,23 +106,15 @@ class LokasiApiController extends Controller
         return response()->json(['message' => 'Lokasi updated!']);
     }
 
-
-
     public function destroy(Request $request)
     {
         $user = Auth::user();
         $lokasi = Lokasi::find($request->id);
-        // cek user
+
         if ($user->id != $lokasi->user_id) {
             return response()->json(['error' => 'Unauthorized']);
         }
         Lokasi::where('id', $request->id)->delete();
         return response()->json(['message' => 'Lokasi deleted!']);
-    }
-
-    public function getImage($id)
-    {
-        $data = Lokasi::find($id);
-        return response()->file(public_path("storage/foto_tps/$data->foto"));
     }
 }
