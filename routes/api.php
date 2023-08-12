@@ -22,4 +22,7 @@ Route::get('/get-lokasi', [Controllers\Api\LokasiApiController::class, 'index'])
 Route::post('/add-lokasi', [Controllers\Api\LokasiApiController::class, 'store'])->middleware('auth:sanctum');
 Route::put('/update-lokasi', [Controllers\Api\LokasiApiController::class, 'update'])->middleware('auth:sanctum');
 Route::delete('/delete-lokasi', [Controllers\Api\LokasiApiController::class, 'destroy'])->middleware('auth:sanctum');
-Route::get('/image/{id}', [Controllers\Api\LokasiApiController::class, 'getImage'])->middleware('auth:sanctum');
+
+//santri
+Route::get('/santri', [Controllers\SantriController::class, 'index']);
+Route::post('/add-santri', [Controllers\SantriController::class, 'store']);
